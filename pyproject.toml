@@ -1,11 +1,12 @@
 [project]
 name = "taxipred"
-version = "0.1.0"
+version = "0.1.1"
 description = "AI Engineering lab project: taxi fare prediction using FastAPI, ML, and Streamlit"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "fastapi>=0.116.2",
+    "matplotlib>=3.10.6",
     "pandas>=2.3.2",
     "setuptools>=80.9.0",
     "streamlit>=1.49.1",
