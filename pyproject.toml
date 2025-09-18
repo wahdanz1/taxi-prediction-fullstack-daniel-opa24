@@ -1,7 +1,7 @@
 [project]
 name = "taxipred"
 version = "0.1.0"
-description = "Add your description here"
+description = "AI Engineering lab project: taxi fare prediction using FastAPI, ML, and Streamlit"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
