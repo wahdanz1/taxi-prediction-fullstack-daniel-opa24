@@ -1,0 +1,50 @@
+/* CSS Styling */
+
+/* Styling for all containers inside the main section */
+div.stMainBlockContainer div[data-testid="stVerticalBlock"] {
+    background: rgba(38, 39, 48, 0.9);
+    padding: 2rem !important;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+}
+
+.stApp {
+    background-image:
+        linear-gradient(rgba(38, 39, 48, 0.25), rgba(38, 39, 48, 0.25)),
+        url("https://images.unsplash.com/photo-1589127383386-270465a13dea?fm=jpg");
+    background-attachment: fixed;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+
+/* Header styling */
+header.stAppHeader {
+    background: rgba(38, 39, 48, 0.5);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+}
+
+/* Target all element containers */
+div[data-testid="stElementContainer"][width] {
+    max-width: 100% !important;
+}
+
+/* Optional: make tables and charts inside behave responsively too */
+div[data-testid="stElementContainer"]>div {
+    max-width: 100% !important;
+}
+
+/* Heading (h3) styling */
+div[data-testid="stHeadingWithActionElements"] h3 {
+    color: rgb(197, 44, 95) !important;
+}
+
+.stTextInput input {
+    background-color: rgb(30, 31, 38) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    border-style: solid !important;
+    border-width: 1px !important;
+    border-radius: 7px !important;
+}
