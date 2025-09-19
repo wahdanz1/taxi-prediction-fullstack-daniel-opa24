@@ -7,7 +7,9 @@ TaxiPred is an app with the goal functionality to be able to predict taxi trip p
 ## 🎯 Planned Features
 
 - **Price Prediction**: ML-powered taxi fare estimation based on distance, time, and location
-- **Interactive Dashboard**: User-friendly Streamlit interface for predictions
+- **Multi-page Dashboard**: User-friendly Streamlit interface with dedicated pages for predictions and model analysis
+- **Location Integration**: Automatic distance calculation between pickup and dropoff locations
+- **Model Performance Visualization**: Interactive charts showing model comparison for stakeholders
 - **REST API**: FastAPI backend with comprehensive endpoints
 - **Data Processing**: Robust data handling and feature engineering
 - **Model Training**: Automated ML pipeline with scikit-learn
@@ -25,16 +27,26 @@ TaxiPred is an app with the goal functionality to be able to predict taxi trip p
 
 ```
 taxipred/
+├── explorations/
+│   └── eda.ipynb              # Exploratory data analysis
 ├── src/taxipred/
 │   ├── backend/
 │   │   ├── api.py              # FastAPI application
 │   │   ├── data_processing.py  # Data handling & preprocessing
+│   │   ├── train_model.py      # ML model training pipeline
 │   │   └── __init__.py
 │   ├── frontend/
-│   │   ├── dashboard.py        # Streamlit dashboard
-│   │   └── __init__.py
+│   │   ├── dashboard.py        # Main Streamlit app
+│   │   ├── pages/
+│   │   │   ├── 1_Price_Prediction.py    # Price estimation page
+│   │   │   ├── 2_Model_Performance.py   # Model analysis for stakeholders
+│   │   │   └── 3_Data_Explorer.py       # Dataset insights
+│   │   └── utils/
+│   │       ├── api_client.py   # FastAPI integration
+│   │       └── helpers.py      # Shared frontend functions
 │   ├── data/
-│   │   └── taxi_trip_pricing.csv
+│   │   ├── taxi_trip_pricing.csv       # Original dataset
+│   │   └── taxi_trip_pricing_clean.csv # Processed dataset
 │   └── utils/
 │       ├── constants.py        # Project constants
 │       ├── helpers.py          # Utility functions
@@ -79,6 +91,10 @@ taxipred/
 
 ### Access Points
 - **Streamlit Dashboard**: http://localhost:8501
+  - **Homepage**: Overview and navigation
+  - **Price Prediction**: Main fare estimation tool
+  - **Model Performance**: Analysis dashboard for stakeholders
+  - **Data Explorer**: Dataset insights and visualizations
 - **FastAPI Backend**: http://localhost:8000
 - **API Documentation**: http://localhost:8000/docs
 
@@ -114,13 +130,16 @@ This lab focuses on:
 🚧 **Under Development**
 
 - [x] Project structure setup
-- [x] Basic FastAPI backend
-- [x] Streamlit frontend foundation
-- [ ] Data processing pipeline
-- [ ] ML model implementation
-- [ ] Model training and evaluation
-- [ ] API integration
-- [ ] Dashboard functionality
+- [x] Exploratory data analysis (EDA)
+- [x] Data cleaning and preprocessing
+- [x] ML model training and evaluation
+- [x] Multi-page Streamlit frontend structure
+- [ ] Frontend user interface implementation
+- [ ] Location API integration for distance calculation
+- [ ] FastAPI backend endpoints
+- [ ] Pydantic data validation models
+- [ ] API integration with frontend
+- [ ] Model deployment and prediction serving
 - [ ] Testing suite
 
 ## 🤝 Contributing
