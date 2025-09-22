@@ -1,24 +1,17 @@
 import streamlit as st
 import pandas as pd
-from dotenv import load_dotenv
-import os
+
 from taxipred.utils.helpers import read_api_endpoint
 from taxipred.frontend.helpers import load_css
-from taxipred.frontend.components import (
-    address_input_with_suggestions, 
-    get_distance
-)
+from taxipred.frontend.components import address_input_with_suggestions,get_distance
 
-# Load CSS and environment
+
+# Load CSS
 load_css()
-load_dotenv()
-
-# Page config
-st.set_page_config(page_title="TaxiPred 1.0", layout="wide")
-
-GMAPS_API_KEY = os.getenv('GMAPS_API_KEY')
 
 def main():
+    # Page config & Title
+    st.set_page_config(page_title="TaxiPred 1.0", layout="wide")
     st.title("Taxi Price Prediction")
     
     # Main prediction interface
@@ -39,11 +32,15 @@ def main():
             st.dataframe(df.head(10))
             st.write(f"Total records: {len(df)}")
         except Exception as e:
-            st.error(f"Could not load dataset: {e}")
+            st.error(f"Could not load dataset: {str(e)}")
+            st.error("Check that your FastAPI backend is running on http://127.0.0.1:8000")
 
 
+# User Form for Price Prediction
 def price_prediction_form():
-    """Main price prediction form."""
+    """Main price prediction form.\n
+    User will enter a pickup and destination address and a pickup time.
+    """
     with st.container():
         st.subheader("🚕 Trip Details")
         
@@ -51,17 +48,15 @@ def price_prediction_form():
         col1, col2 = st.columns([1, 1])
         
         with col1:
-            pickup_address, pickup_place_id = address_input_with_suggestions(
+            pickup_address = address_input_with_suggestions(
                 "📍 Pickup Location", 
-                "pickup", 
-                GMAPS_API_KEY
+                "pickup"
             )
         
         with col2:
-            destination_address, destination_place_id = address_input_with_suggestions(
+            destination_address = address_input_with_suggestions(
                 "🎯 Destination", 
-                "destination", 
-                GMAPS_API_KEY
+                "destination"
             )
         
         # Additional options
@@ -75,7 +70,7 @@ def price_prediction_form():
         if st.button("Get Price Estimate", type="primary", use_container_width=True):
             if pickup_address and destination_address:
                 with st.spinner("Calculating distance and price..."):
-                    distance = get_distance(pickup_address, destination_address, GMAPS_API_KEY)
+                    distance = get_distance(pickup_address, destination_address)
                     
                     if distance:
                         return {
@@ -92,6 +87,7 @@ def price_prediction_form():
     return None
 
 
+# Function for displaying trip results based on what user entered in the form
 def display_trip_result(trip_data):
     """Display trip results and price estimate."""
     st.success("Trip Details Calculated!")
