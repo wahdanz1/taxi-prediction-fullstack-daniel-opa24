@@ -1,17 +1,17 @@
 [project]
 name = "taxipred"
-version = "0.1.2"
+version = "0.1.3"
 description = "AI Engineering lab project: taxi fare prediction using FastAPI, ML, and Streamlit"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "dotenv>=0.9.9",
     "fastapi>=0.116.2",
     "googlemaps>=4.10.0",
     "matplotlib>=3.10.6",
     "pandas>=2.3.2",
+    "python-dotenv>=1.0.0",
+    "requests>=2.31.0",
     "scikit-learn>=1.7.2",
-    "setuptools>=80.9.0",
     "streamlit>=1.49.1",
     "uvicorn>=0.35.0",
 ]
