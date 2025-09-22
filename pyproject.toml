@@ -5,7 +5,9 @@ description = "AI Engineering lab project: taxi fare prediction using FastAPI, M
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "dotenv>=0.9.9",
     "fastapi>=0.116.2",
+    "googlemaps>=4.10.0",
     "matplotlib>=3.10.6",
     "pandas>=2.3.2",
     "scikit-learn>=1.7.2",
