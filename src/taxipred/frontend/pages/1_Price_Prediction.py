@@ -64,7 +64,10 @@ def price_prediction_form():
         with col3:
             pickup_time = st.time_input("🕐 Pickup Time")
         with col4:
-            st.write("")  # Spacing
+            passenger_count = st.selectbox(
+                "🙋 Number of Passengers",
+                options=[1, 2, 3, 4]
+            )
         
         # Calculate button
         if st.button("Get Price Estimate", type="primary", use_container_width=True):
@@ -77,7 +80,8 @@ def price_prediction_form():
                             'pickup': pickup_address,
                             'destination': destination_address,
                             'distance': distance,
-                            'pickup_time': pickup_time
+                            'pickup_time': pickup_time,
+                            'passenger_count': passenger_count
                         }
                     else:
                         st.error("Could not calculate distance between addresses. Please check your locations.")
@@ -106,6 +110,7 @@ def display_trip_result(trip_data):
         **Distance:** {trip_data['distance']} km
         
         **Pickup Time:** {trip_data['pickup_time']}
+        **Passengers:** {trip_data['passenger_count']}
         """)
     
     with col2:
