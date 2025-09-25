@@ -1,27 +1,37 @@
 import requests 
 import streamlit as st
 from datetime import datetime
-
 from taxipred.utils.constants import API_BASE_URL
 
 
-def get_api_data(endpoint):
-    """Simple GET request to API endpoint."""
+def get_api_data(endpoint: str):
+    """Make GET request to API endpoint."""
     url = f"{API_BASE_URL}/{endpoint.lstrip('/')}"
     response = requests.get(url)
     return response
 
 
-def post_api_data(endpoint, data):
-    """Simple POST request to API endpoint with JSON data."""
+def post_api_data(endpoint: str, data: dict):
+    """Make POST request to API endpoint with JSON data."""
     url = f"{API_BASE_URL}/{endpoint.lstrip('/')}"
     response = requests.post(url, json=data)
     return response
 
-# Build dict and make API request --------------------
-def call_prediction_api(distance, passenger_count, pickup_date, pickup_time):
-    """Build request data and call the API."""
 
+# Prediction API calls
+def call_prediction_api(distance: float, passenger_count: int, pickup_date, pickup_time):
+    """
+    Build prediction request and call ML prediction API.
+    
+    Args:
+        distance: Trip distance in kilometers
+        passenger_count: Number of passengers
+        pickup_date: Date object for pickup
+        pickup_time: Time object for pickup
+        
+    Returns:
+        Response object from prediction API
+    """
     pickup_datetime = datetime.combine(pickup_date, pickup_time)
     user_input_dict = {
         'trip_distance_km': distance,
@@ -29,14 +39,20 @@ def call_prediction_api(distance, passenger_count, pickup_date, pickup_time):
         'pickup_datetime': pickup_datetime.strftime("%Y-%m-%dT%H:%M"),
     }
 
-    # Make the API call and return response
-    response = post_api_data("predict", user_input_dict)
-    return response
+    return post_api_data("predict", user_input_dict)
 
 
-# Call endpoint for Google Places API --------------------
-def call_address_suggestions_api(query):
-    """Get address suggestions via backend API."""
+# Google Services API calls
+def call_address_suggestions_api(query: str) -> list:
+    """
+    Get address suggestions via backend Google Places API.
+    
+    Args:
+        query: Address search string
+        
+    Returns:
+        List of address suggestions, empty list if error
+    """
     response = post_api_data("suggestion", {"query": query})
     processed_data = handle_api_response(response)
     if processed_data:
@@ -44,9 +60,17 @@ def call_address_suggestions_api(query):
     return []
 
 
-# Call endpoint for Google Distance Matrix API --------------------
-def call_distance_api(origin, destination):
-    """Calculate distance via backend API."""
+def call_distance_api(origin: str, destination: str) -> float | None:
+    """
+    Calculate distance via backend Google Distance Matrix API.
+    
+    Args:
+        origin: Starting address
+        destination: Destination address
+        
+    Returns:
+        Distance in kilometers, None if calculation fails
+    """
     response = post_api_data("distance", {"origin": origin, "destination": destination})
     processed_data = handle_api_response(response)
     if processed_data:
@@ -54,26 +78,45 @@ def call_distance_api(origin, destination):
     return None
 
 
-# Handle API response and extract JSON --------------------
+# Response handling
 def handle_api_response(response):
-    """Process API response and handle errors."""
-    # Check response status
+    """
+    Process API response and handle errors with Streamlit feedback.
+    
+    Args:
+        response: Response object from API call
+        
+    Returns:
+        Parsed JSON data or None if error
+    """
     if response.status_code != 200:
         st.error(f"API Error: {response.status_code}")
         return None
     
-    # Extract JSON data and return it
     try:
-        api_data = response.json()
-        return api_data
+        return response.json()
     except Exception as e:
         st.error(f"Failed to parse response: {e}")
         return None
 
 
-# Format data and prepare for display --------------------
-def format_trip_data_for_display(api_response, pickup_address, destination_address, distance, passenger_count):
-    """Transform API response + user inputs into display format."""
+# Data formatting
+def format_trip_data_for_display(api_response: dict, pickup_address: str, 
+                                destination_address: str, distance: float, 
+                                passenger_count: int) -> dict:
+    """
+    Transform API response and user inputs into display-ready format.
+    
+    Args:
+        api_response: Response from prediction API
+        pickup_address: User-entered pickup address
+        destination_address: User-entered destination address  
+        distance: Calculated trip distance
+        passenger_count: Number of passengers
+        
+    Returns:
+        Dictionary formatted for UI display
+    """
     return {
         'pickup': pickup_address,
         'destination': destination_address,
