@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException
-from taxipred.backend.data_processing import TaxiData
+from taxipred.backend.data_processing import TaxiData, InputModel, ResponseModel, SuggestionRequest, DistanceRequest
+from taxipred.backend.google_services import suggest_address, get_distance
 
 # Initialize the FastAPI app instance
 app = FastAPI(
@@ -9,6 +10,12 @@ app = FastAPI(
 )
 
 taxi_data = TaxiData()
+
+# API Health Check endpoint
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy", "service": "TaxiPred API"}
+
 
 # Serve cleaned dataset
 @app.get("/taxi/")
@@ -27,16 +34,40 @@ async def show_stats():
 
 
 # ML prediction
-@app.post("/predict")
-async def predict_price():
-    # Transform input using encoders
-    # Make prediction
-    # Return result
-    # --- Placeholder for now
-    return {"estimated_price": 45.50, "status": "prediction_placeholder"}
+@app.post("/predict", response_model=ResponseModel)
+async def predict_price(input_data: InputModel):
+    try:
+        result = taxi_data.predict_price(
+            input_data.trip_distance_km,
+            input_data.passenger_count,
+            input_data.pickup_datetime,
+            input_data.weather,
+            input_data.traffic_conditions
+        )
+        return result
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=f"Bad Request: {str(ve)}")
+    except RuntimeError as re:
+        raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(re)}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
 
 
-# API Health Check endpoint
-@app.get("/health")
-async def health_check():
-    return {"status": "healthy", "service": "TaxiPred API"}
+@app.post("/suggestion")
+async def get_address_suggestions(request: SuggestionRequest):
+    try:
+        suggestions = suggest_address(request.query)
+        return {"suggestions": suggestions}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Suggestion error: {str(e)}")
+
+
+@app.post("/distance") 
+async def get_trip_distance(request: DistanceRequest):
+    try:
+        distance = get_distance(request.origin, request.destination)
+        if distance is None:
+            raise HTTPException(status_code=400, detail="Could not calculate distance")
+        return {"distance_km": distance}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Distance calculation error: {str(e)}")
