@@ -12,6 +12,38 @@ def load_css():
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 
+# Session state management
+def initialize_prediction_state():
+    """Initialize session state variables for the prediction workflow."""
+    if "prediction_complete" not in st.session_state:
+        st.session_state.prediction_complete = False
+    if "trip_data" not in st.session_state:
+        st.session_state.trip_data = None
+    if "processing" not in st.session_state:
+        st.session_state.processing = False
+
+def reset_prediction_state():
+    """Reset all session state for new prediction."""
+    st.session_state.prediction_complete = False
+    st.session_state.processing = False
+    st.session_state.trip_data = None
+    if 'form_data' in st.session_state:
+        del st.session_state.form_data
+
+def handle_processing_error(progress_bar, status_text, error_message: str):
+    """Handle processing errors with user feedback and state reset."""
+    progress_bar.progress(100)
+    status_text.text("Processing failed")
+    time.sleep(1)
+    progress_bar.empty()
+    status_text.empty()
+    st.error(error_message)
+    
+    st.session_state.processing = False
+    time.sleep(2)
+    st.rerun()
+
+
 # Time utilities
 def round_to_quarter(t: time_type, up: bool = False) -> time_type:
     """
