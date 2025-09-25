@@ -58,7 +58,7 @@ taxipred/
 │   │   │   ├── 2_Model_Performance.py   # Model analytics dashboard
 │   │   │   └── 3_Data_Explorer.py       # Dataset exploration tools
 │   │   ├── dashboard.py             # Main Streamlit application
-│   │   ├── helpers.py              # Frontend utility functions
+│   │   ├── ui_helpers.py           # Frontend utility functions
 │   │   ├── ui_components.py        # Reusable UI components
 │   │   └── styles.css              # Custom styling
 │   ├── data/
@@ -66,7 +66,7 @@ taxipred/
 │   │   └── taxi_trip_pricing_clean.csv  # Processed dataset
 │   └── utils/
 │       ├── constants.py            # Project-wide constants
-│       └── helpers.py              # Shared utility functions
+│       └── api_helpers.py          # API communication utilities
 ├── data_cleaning_summary.md        # Detailed data processing documentation
 ├── .env                            # Environment variables (create this)
 ├── start.ps1                       # Windows launcher script
@@ -100,14 +100,7 @@ taxipred/
    echo "GMAPS_API_KEY=your_google_api_key_here" > .env
    ```
 
-4. **Model Training**
-   To recreate the trained models:
-   ```bash
-   # Run from project root
-   python src/taxipred/scripts/train_model.py
-   ```
-
-5. **Launch the application**
+4. **Launch the application**
    ```bash
    # Windows PowerShell (recommended)
    .\start.ps1
