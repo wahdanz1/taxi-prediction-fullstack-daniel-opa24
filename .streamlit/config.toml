@@ -1,0 +1,8 @@
+[theme]
+base="dark"  # gives you white text by default, we override colors below
+
+# Colors
+primaryColor="rgba(228, 32, 97, 1)"             # matches your h3 accent
+backgroundColor="#262730"          # same as your dark panel background
+secondaryBackgroundColor="#1e1f26" # same as your inputs
+textColor="#ffffff"
