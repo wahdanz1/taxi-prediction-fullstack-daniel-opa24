@@ -1,151 +1,217 @@
-# OPA24 - AI Engineering, Lab 1: TaxiPred
+# TaxiPred 🚕 - AI-Powered Taxi Fare Prediction
 
-This is the first lab of the AI Engineering/OOP Advanced course in my programming education.
+**OPA24 - AI Engineering, Lab 1**
 
-TaxiPred is an app with the goal functionality to be able to predict taxi trip prices with high accuracy. It is currently under development and will in the end contain the following features:
+TaxiPred is a full-stack machine learning application that predicts taxi fare prices with high accuracy using advanced ML models and real-world factors like weather, traffic, and time patterns.
 
-## 🎯 Planned Features
+## ✨ Features
 
-- **Price Prediction**: ML-powered taxi fare estimation based on distance, time, and location
-- **Multi-page Dashboard**: User-friendly Streamlit interface with dedicated pages for predictions and model analysis
-- **Location Integration**: Automatic distance calculation between pickup and dropoff locations
-- **Model Performance Visualization**: Interactive charts showing model comparison for stakeholders
-- **REST API**: FastAPI backend with comprehensive endpoints
-- **Data Processing**: Robust data handling and feature engineering
-- **Model Training**: Automated ML pipeline with scikit-learn
-- **Validation**: Data validation using Pydantic models
+### 🎯 **Core Functionality**
+- **Smart Price Prediction**: ML-powered fare estimation using distance, passenger count, pickup time, weather, and traffic conditions
+- **Address Autocomplete**: Google Places API integration for seamless location input
+- **Real-time Distance Calculation**: Automatic route distance computation via Google Distance Matrix API
+- **Interactive Progress Tracking**: Smooth UI feedback during prediction process
+
+### 📊 **Dashboard & Analytics**
+- **Multi-page Streamlit Interface**: Professional dashboard with dedicated sections
+- **Model Performance Visualization**: Interactive charts and metrics for stakeholders
+- **Data Explorer**: Comprehensive dataset insights and analytics
+- **Trip Summary**: Detailed breakdown of prediction factors
+
+### 🔧 **Technical Features**
+- **REST API**: Comprehensive FastAPI backend with full documentation
+- **Data Validation**: Robust input validation using Pydantic models
+- **Feature Engineering**: Advanced ML features including interaction terms and time-based variables
+- **Model Persistence**: Trained model artifacts with metrics and feature importance
+- **Error Handling**: Comprehensive error management and user feedback
 
 ## 🛠️ Tech Stack
 
-- **Backend**: FastAPI - Modern, fast web framework for APIs
-- **Machine Learning**: scikit-learn - ML model training and predictions
-- **Data Validation**: Pydantic - Type validation and serialization
-- **Frontend**: Streamlit - Interactive web dashboard
-- **Environment**: UV - Modern Python dependency management
+| Component | Technology | Purpose |
+|-----------|------------|---------|
+| **Backend API** | FastAPI | High-performance REST API with automatic documentation |
+| **Frontend** | Streamlit | Interactive multi-page dashboard |
+| **ML Framework** | scikit-learn | Model training, prediction, and evaluation |
+| **Data Validation** | Pydantic | Type validation and serialization |
+| **External APIs** | Google Places & Distance Matrix | Location services and distance calculation |
+| **Package Management** | UV | Modern Python dependency management |
+| **Data Processing** | pandas, joblib | Data manipulation and model persistence |
 
 ## 📁 Project Structure
 
 ```
 taxipred/
 ├── explorations/
-│   └── eda.ipynb              # Exploratory data analysis
+│   └── eda.ipynb                    # Exploratory data analysis
 ├── src/taxipred/
 │   ├── backend/
-│   │   ├── api.py              # FastAPI application
-│   │   ├── data_processing.py  # Data handling & preprocessing
-│   │   ├── train_model.py      # ML model training pipeline
-│   │   └── __init__.py
+│   │   ├── models/                  # Trained model artifacts
+│   │   ├── api.py                   # FastAPI application with all endpoints
+│   │   ├── data_processing.py       # Runtime ML pipeline and feature engineering
+│   │   └── google_services.py       # Google APIs integration
+│   ├── scripts/
+│   │   ├── data_cleaning.py         # Advanced data cleaning pipeline
+│   │   └── train_model.py          # Model training pipeline
 │   ├── frontend/
-│   │   ├── dashboard.py        # Main Streamlit app
 │   │   ├── pages/
-│   │   │   ├── 1_Price_Prediction.py    # Price estimation page
-│   │   │   ├── 2_Model_Performance.py   # Model analysis for stakeholders
-│   │   │   └── 3_Data_Explorer.py       # Dataset insights
-│   │   └── utils/
-│   │       ├── api_client.py   # FastAPI integration
-│   │       └── helpers.py      # Shared frontend functions
+│   │   │   ├── 1_Price_Prediction.py    # Main prediction interface
+│   │   │   ├── 2_Model_Performance.py   # Model analytics dashboard
+│   │   │   └── 3_Data_Explorer.py       # Dataset exploration tools
+│   │   ├── dashboard.py             # Main Streamlit application
+│   │   ├── helpers.py              # Frontend utility functions
+│   │   ├── ui_components.py        # Reusable UI components
+│   │   └── styles.css              # Custom styling
 │   ├── data/
-│   │   ├── taxi_trip_pricing.csv       # Original dataset
-│   │   └── taxi_trip_pricing_clean.csv # Processed dataset
+│   │   ├── taxi_trip_pricing.csv        # Original dataset
+│   │   └── taxi_trip_pricing_clean.csv  # Processed dataset
 │   └── utils/
-│       ├── constants.py        # Project constants
-│       ├── helpers.py          # Utility functions
-│       └── __init__.py
-├── start.ps1                   # Launch script
-├── pyproject.toml             # Project dependencies
+│       ├── constants.py            # Project-wide constants
+│       └── helpers.py              # Shared utility functions
+├── data_cleaning_summary.md        # Detailed data processing documentation
+├── .env                            # Environment variables (create this)
+├── start.ps1                       # Windows launcher script
+├── pyproject.toml                  # Project dependencies and metadata
 └── README.md
 ```
 
-## 🚀 Getting Started
+## 🚀 Quick Start
 
 ### Prerequisites
 - Python 3.8+
-- UV (recommended) or pip
+- UV package manager (recommended) or pip
+- Google Cloud API key for Places and Distance Matrix APIs
 
 ### Installation
 
-1. **Clone the repository**
+1. **Clone and navigate to project**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/wahdanz1/taxi-prediction-fullstack-daniel-opa24
    cd taxipred
    ```
 
-2. **Set up environment**
+2. **Install dependencies**
    ```bash
    uv sync
    ```
 
-3. **Launch the application**
+3. **Set up environment variables**
    ```bash
-   # Windows PowerShell
+   # Create .env file in project root
+   echo "GMAPS_API_KEY=your_google_api_key_here" > .env
+   ```
+
+4. **Launch the application**
+   ```bash
+   # Windows PowerShell (recommended)
    .\start.ps1
    
-   # Or manually:
-   # Terminal 1 - Backend
-   cd src/taxipred/backend
-   uvicorn api:app --reload
+   # Or launch manually:
+   # Terminal 1 - Backend API
+   cd src/taxipred/backend && uvicorn api:app --reload
    
-   # Terminal 2 - Frontend
+   # Terminal 2 - Frontend Dashboard  
    streamlit run src/taxipred/frontend/dashboard.py
    ```
 
-### Access Points
-- **Streamlit Dashboard**: http://localhost:8501
-  - **Homepage**: Overview and navigation
-  - **Price Prediction**: Main fare estimation tool
-  - **Model Performance**: Analysis dashboard for stakeholders
-  - **Data Explorer**: Dataset insights and visualizations
-- **FastAPI Backend**: http://localhost:8000
-- **API Documentation**: http://localhost:8000/docs
+### 🌐 Access Points
+- **📱 Streamlit Dashboard**: http://localhost:8501
+- **🔌 FastAPI Backend**: http://localhost:8000
+- **📚 API Documentation**: http://localhost:8000/docs
 
-## 📊 Dataset
+## 🎯 Usage Guide
 
-The project uses taxi trip pricing data containing features such as:
-- Trip distance and duration
-- Pickup and dropoff locations
-- Time and date information
-- Weather conditions
-- Traffic patterns
+### Making Predictions
+1. **Enter Locations**: Use suggestions for pickup and destination addresses
+2. **Set Trip Details**: Choose date, time, and passenger count
+3. **Get Estimate**: View real-time prediction with detailed breakdown
+4. **Analyze Results**: Review factors considered in the prediction
 
-## 🧠 Machine Learning Pipeline
+### API Endpoints
+- `GET /health` - API health check
+- `GET /taxi/` - Retrieve cleaned dataset
+- `GET /taxi/stats` - Dataset statistics
+- `POST /predict` - Generate fare prediction
+- `POST /suggestion` - Get address suggestions
+- `POST /distance` - Calculate trip distance
 
-1. **Data Preprocessing**: Clean and prepare raw taxi data
-2. **Feature Engineering**: Extract relevant features for prediction
-3. **Model Training**: Train ML models using scikit-learn
-4. **Evaluation**: Assess model performance and accuracy
-5. **Deployment**: Serve predictions via FastAPI
+## 📊 Machine Learning Pipeline
 
-## 🎓 Learning Objectives
+### Advanced Data Processing
+- **Three-round cleaning methodology** with mathematical recovery and data leakage prevention
+- **Sophisticated feature engineering** including weather/traffic multipliers and interaction terms  
+- **Honest performance evaluation** prioritizing legitimate prediction over artificially low error rates
+- **Data retention**: 97.7% of original data retained through intelligent cleaning
 
-This lab focuses on:
-- Building production-ready ML applications
-- API development with FastAPI
-- Data validation with Pydantic
-- Interactive dashboards with Streamlit
-- Modern Python project structure
-- Dependency management with UV
+*See [data_cleaning_summary.md](data_cleaning_summary.md) for detailed technical documentation*
 
-## 📈 Current Status
+### Model Architecture
+- **Distance-based pricing**: Primary fare component (97% feature importance)
+- **Environmental factors**: Weather impact (Clear: 1.0, Rain: 1.15, Snow: 1.3) and traffic multipliers
+- **Time-based adjustments**: Rush hour detection, weekend patterns, peak hour identification
+- **Interaction features**: Complex relationships like `distance_x_conditions` for enhanced accuracy
 
-🚧 **Under Development**
+### Performance Metrics
+- **Final Model**: $15.74 MAE, 0.821 R² (legitimate prediction without data leakage)
+- **Feature importance tracking** and comprehensive model validation
+- **Production-ready artifacts** with persistent model storage
 
-- [x] Project structure setup
-- [x] Exploratory data analysis (EDA)
-- [x] Data cleaning and preprocessing
-- [x] ML model training and evaluation
-- [x] Multi-page Streamlit frontend structure
-- [ ] Frontend user interface implementation
-- [ ] Location API integration for distance calculation
-- [ ] FastAPI backend endpoints
-- [ ] Pydantic data validation models
-- [ ] API integration with frontend
-- [ ] Model deployment and prediction serving
-- [ ] Testing suite
+## 🔧 Configuration
+
+### Environment Variables
+Create a `.env` file in the project root:
+```env
+GMAPS_API_KEY=your_google_maps_api_key
+```
+
+### Google APIs Setup
+1. Enable Google Places API
+2. Enable Google Distance Matrix API  
+3. Create API key with appropriate restrictions
+4. Add billing information (required for production usage)
+
+## 🎓 Learning Outcomes
+
+This project demonstrates advanced ML engineering concepts:
+
+### **Core ML Principles**
+- **Data leakage detection and prevention** - avoiding "AI calculator" approaches
+- **Feature engineering mastery** - creating meaningful interactions when raw signals prove weak
+- **Domain knowledge application** - using business logic for data quality without compromising model integrity
+- **Honest performance evaluation** - choosing legitimate prediction over competition metrics
+
+### **Production Development**
+- **Full-stack ML architecture** from data cleaning to user interface
+- **Modern API design** with FastAPI, comprehensive validation, and error handling
+- **Interactive dashboard development** with real-time feedback and progressive UI states
+- **External service integration** with proper error handling and graceful degradation
+
+### **Software Engineering**
+- **Professional project organization** with modular design and proper dependency management
+- **Advanced data processing** with iterative improvement and quality assurance
+- **User experience focus** - designing for real-world inputs rather than perfect data
+- **Documentation excellence** - separating concerns between README and technical details
+
+## 📈 Project Status
+
+### ✅ **Completed Features**
+- [x] Complete ML pipeline with sophisticated data cleaning and feature engineering
+- [x] FastAPI backend with comprehensive endpoints and validation
+- [x] Multi-page Streamlit frontend with professional UI
+- [x] Google APIs integration (Places & Distance Matrix)
+- [x] Real-time prediction with smooth progress tracking
+- [x] Address autocomplete functionality
+- [x] Robust error handling and user feedback
+- [x] Model persistence with metrics and feature importance tracking
+- [x] Data exploration and visualization tools
 
 ## 🤝 Contributing
 
-This is an educational project. Feedback and suggestions are welcome!
+This is an educational project for my OOP/AI Programming Education. Feedback, suggestions, and improvements are welcome!
 
-## 📝 License
+## 📄 License
 
-Educational project - part of OPA24 AI Engineering course.
+Educational project - Part of my OOP/AI Programming Education coursework.
+
+---
+
+**Built with ❤️ using modern Python ML stack**
