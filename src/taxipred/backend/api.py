@@ -2,40 +2,63 @@ from fastapi import FastAPI, HTTPException
 from taxipred.backend.data_processing import TaxiData, InputModel, ResponseModel, SuggestionRequest, DistanceRequest
 from taxipred.backend.google_services import suggest_address, get_distance
 
-# Initialize the FastAPI app instance
 app = FastAPI(
     title="TaxiPred API",
-    description="Taxi price prediction API",
-    version="1.0.0"
+    description="AI-powered taxi fare prediction API with location services",
+    version="1.2.0"
 )
 
 taxi_data = TaxiData()
 
-# API Health Check endpoint
+
 @app.get("/health")
-async def health_check():
+async def health_check() -> dict:
+    """API health check endpoint."""
     return {"status": "healthy", "service": "TaxiPred API"}
 
 
-# Serve cleaned dataset
 @app.get("/taxi/")
-async def get_taxi_data():
+async def get_taxi_data() -> list:
+    """
+    Retrieve the cleaned taxi dataset in JSON format.
+    
+    Returns:
+        List of taxi trip records with all features used for training
+    """
     return taxi_data.to_json()
 
 
-# Dataset info
 @app.get("/taxi/stats")
-async def show_stats():
+async def get_dataset_stats() -> dict:
+    """
+    Get statistical summary of the taxi dataset.
+    
+    Returns:
+        Dataset statistics including record counts, price distribution, and distance metrics
+    """
     try:
-        stats = taxi_data.get_stats()
-        return stats
+        return taxi_data.get_stats()
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error getting stats: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error retrieving stats: {str(e)}")
 
 
-# ML prediction
 @app.post("/predict", response_model=ResponseModel)
-async def predict_price(input_data: InputModel):
+async def predict_fare(input_data: InputModel) -> ResponseModel:
+    """
+    Predict taxi fare using ML model.
+    
+    Uses trained model with engineered features including distance, time factors,
+    weather conditions, and traffic patterns to estimate fare price.
+    
+    Args:
+        input_data: Trip details including distance, passengers, datetime, weather, and traffic
+        
+    Returns:
+        Fare prediction with detailed breakdown of factors considered
+        
+    Raises:
+        HTTPException: 400 for invalid input, 500 for prediction errors
+    """
     try:
         result = taxi_data.predict_price(
             input_data.trip_distance_km,
@@ -45,29 +68,58 @@ async def predict_price(input_data: InputModel):
             input_data.traffic_conditions
         )
         return result
-    except ValueError as ve:
-        raise HTTPException(status_code=400, detail=f"Bad Request: {str(ve)}")
-    except RuntimeError as re:
-        raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(re)}")
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except RuntimeError as e:
+        raise HTTPException(status_code=500, detail=str(e))
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Prediction error: {str(e)}")
 
 
 @app.post("/suggestion")
-async def get_address_suggestions(request: SuggestionRequest):
+async def get_address_suggestions(request: SuggestionRequest) -> dict:
+    """
+    Get address suggestions using Google Places API.
+    
+    Provides autocomplete suggestions for Swedish addresses to improve
+    user experience when entering pickup and destination locations.
+    
+    Args:
+        request: Address search query
+        
+    Returns:
+        Dictionary containing list of address suggestions
+    """
     try:
         suggestions = suggest_address(request.query)
         return {"suggestions": suggestions}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Suggestion error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Address suggestion error: {str(e)}")
 
 
-@app.post("/distance") 
-async def get_trip_distance(request: DistanceRequest):
+@app.post("/distance")
+async def calculate_trip_distance(request: DistanceRequest) -> dict:
+    """
+    Calculate driving distance between two addresses.
+    
+    Uses Google Distance Matrix API to compute actual road distance
+    rather than straight-line distance for accurate fare prediction.
+    
+    Args:
+        request: Origin and destination addresses
+        
+    Returns:
+        Dictionary containing distance in kilometers
+        
+    Raises:
+        HTTPException: 400 if distance cannot be calculated, 500 for API errors
+    """
     try:
         distance = get_distance(request.origin, request.destination)
         if distance is None:
-            raise HTTPException(status_code=400, detail="Could not calculate distance")
+            raise HTTPException(status_code=400, detail="Could not calculate distance between addresses")
         return {"distance_km": distance}
+    except HTTPException:
+        raise  # Re-raise HTTPExceptions as-is
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Distance calculation error: {str(e)}")
