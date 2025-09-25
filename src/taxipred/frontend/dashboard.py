@@ -1,5 +1,5 @@
 import streamlit as st
-from taxipred.frontend.helpers import load_css
+from taxipred.frontend.ui_helpers import load_css
 
 # Load CSS
 load_css()

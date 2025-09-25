@@ -2,8 +2,8 @@ import streamlit as st
 import time
 from datetime import datetime
 
-from taxipred.frontend.helpers import load_css, round_to_quarter, smooth_progress
-from taxipred.utils.helpers import call_prediction_api, handle_api_response, format_trip_data_for_display
+from taxipred.frontend.ui_helpers import load_css, round_to_quarter, smooth_progress
+from taxipred.utils.api_helpers import call_prediction_api, handle_api_response, format_trip_data_for_display
 from taxipred.frontend.ui_components import address_input_with_suggestions, get_distance_via_api
 
 # Load CSS

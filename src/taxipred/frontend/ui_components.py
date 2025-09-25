@@ -1,5 +1,5 @@
 import streamlit as st
-from taxipred.utils.helpers import call_address_suggestions_api, call_distance_api
+from taxipred.utils.api_helpers import call_address_suggestions_api, call_distance_api
 
 def address_input_with_suggestions(label, key):
     """Create address input with autocomplete suggestions."""
