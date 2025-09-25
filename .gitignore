@@ -214,3 +214,11 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Model artifacts
+src/taxipred/backend/models/*.joblib
+*.joblib
+
+# Other ML artifacts
+*.pkl
+*.model
