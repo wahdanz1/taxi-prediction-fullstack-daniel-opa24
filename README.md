@@ -100,7 +100,14 @@ taxipred/
    echo "GMAPS_API_KEY=your_google_api_key_here" > .env
    ```
 
-4. **Launch the application**
+4. **Model Training**
+   To recreate the trained models:
+   ```bash
+   # Run from project root
+   python src/taxipred/scripts/train_model.py
+   ```
+
+5. **Launch the application**
    ```bash
    # Windows PowerShell (recommended)
    .\start.ps1
