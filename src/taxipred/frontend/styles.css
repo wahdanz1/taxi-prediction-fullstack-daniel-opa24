@@ -38,23 +38,5 @@ div[data-testid="stElementContainer"]>div {
 
 /* Heading (h3) styling */
 div[data-testid="stHeadingWithActionElements"] h3 {
-    color: rgb(197, 44, 95) !important;
-}
-
-/* text_input styling */
-div[data-testid="stTextInput"] input {
-    background-color: rgb(30, 31, 38) !important;
-    border-color: rgba(255, 255, 255, 0.1) !important;
-    border-style: solid !important;
-    border-width: 1px !important;
-    border-radius: 7px !important;
-}
-
-/* time_input styling */
-div[data-testid="stTimeInput"] div[data-baseweb="select"] {
-    background-color: rgb(30, 31, 38) !important;
-    border-color: rgba(255, 255, 255, 0.1) !important;
-    border-style: solid !important;
-    border-width: 1px !important;
-    border-radius: 7px !important;
+    color: rgb(228, 32, 130) !important;
 }
