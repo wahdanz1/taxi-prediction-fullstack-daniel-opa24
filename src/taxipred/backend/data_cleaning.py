@@ -219,6 +219,31 @@ def clean_dataset(input_path: str = TAXI_CSV_PATH, output_path: str = CLEAN_TAXI
     removed_final = initial_before_final - len(df_final)
     if removed_final > 0:
         print(f"Removed {removed_final} rows with missing critical values")
+
+    # STEP 7 --------------------------------------------------
+    print("\nStep 7: Dropping original categorical features (keeping engineered ones)...")
+    categorical_to_drop = ['time_of_day', 'day_of_week', 'traffic_conditions', 'weather']
+    existing_categoricals = [col for col in categorical_to_drop if col in df_final.columns]
+
+    if existing_categoricals:
+        print(f"Dropping original categoricals: {existing_categoricals}")
+        df_final = df_final.drop(columns=existing_categoricals)
+        print(f"Kept engineered features: weather_impact, traffic_multiplier, is_morning_rush, is_evening_rush, etc.")
+    else:
+        print("No categorical features found to drop")
+
+    print(f"Final dataset shape: {df_final.shape}")
+
+    # Verify all columns are numerical
+    print("\nFinal feature types:")
+    for col in df_final.columns:
+        print(f"  {col}: {df_final[col].dtype}")
+
+    non_numeric = df_final.select_dtypes(include=['object']).columns
+    if len(non_numeric) == 0:
+        print("Success: All features are numerical - no encoding needed in training!")
+    else:
+        print(f"Warning: Non-numeric columns still present: {list(non_numeric)}")
     
     # Final summary --------------------------------------------------
     total_removed = len(df) - len(df_final)
