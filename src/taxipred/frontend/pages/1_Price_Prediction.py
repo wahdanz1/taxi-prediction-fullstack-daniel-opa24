@@ -3,7 +3,6 @@ import streamlit as st
 from taxipred.frontend.ui_helpers import load_css, initialize_prediction_state, reset_prediction_state
 from taxipred.frontend.ui_components import render_trip_form, render_prediction_workflow, render_trip_summary
 
-load_css()
 
 
 def main():
