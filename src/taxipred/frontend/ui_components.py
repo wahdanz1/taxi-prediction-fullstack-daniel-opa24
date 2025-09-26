@@ -62,6 +62,9 @@ def render_prediction_workflow(form_data: dict):
     Args:
         form_data: User input data from the form
     """
+    # Clear lingering elements when button is clicked
+    st.empty() 
+
     st.subheader("Processing Your Request")
     
     progress_bar = st.progress(0)
