@@ -15,9 +15,9 @@ def main():
     # Define pages structure
     pages = {
         "TaxiPred 1.0": [
-            st.Page("pages/1_Price_Prediction.py", title="Price Prediction", icon="🤑"),
-            st.Page("pages/2_Model_Performance.py", title="Model Performance", icon="🤖"),
-            st.Page("pages/3_Data_Explorer.py", title="Data Explorer", icon="📊"),
+            st.Page("pages/1_Price_Prediction.py", title=" Price Prediction", icon="🤑"),
+            st.Page("pages/2_Data_Explorer.py", title=" Data Explorer", icon="📊"),
+            st.Page("pages/3_Model_Performance.py", title=" Model Performance", icon="🧠"),
         ],
     }
 
