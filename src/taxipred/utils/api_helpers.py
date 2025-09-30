@@ -19,7 +19,8 @@ def post_api_data(endpoint: str, data: dict):
 
 
 # Prediction API calls
-def call_prediction_api(distance: float, passenger_count: int, pickup_date, pickup_time):
+def call_prediction_api(distance: float, passenger_count: int, pickup_date, pickup_time, 
+                        weather: str, traffic_conditions: str):
     """
     Build prediction request and call ML prediction API.
     
@@ -28,6 +29,8 @@ def call_prediction_api(distance: float, passenger_count: int, pickup_date, pick
         passenger_count: Number of passengers
         pickup_date: Date object for pickup
         pickup_time: Time object for pickup
+        weather: Weather condition ("Clear", "Rain", "Snow")
+        traffic_conditions: Traffic level ("Low", "Medium", "High")
         
     Returns:
         Response object from prediction API
@@ -37,6 +40,8 @@ def call_prediction_api(distance: float, passenger_count: int, pickup_date, pick
         'trip_distance_km': distance,
         'passenger_count': passenger_count,
         'pickup_datetime': pickup_datetime.strftime("%Y-%m-%dT%H:%M"),
+        'weather': weather,
+        'traffic_conditions': traffic_conditions
     }
 
     return post_api_data("predict", user_input_dict)
@@ -60,21 +65,27 @@ def call_address_suggestions_api(query: str) -> list:
     return []
 
 
-def call_distance_api(origin: str, destination: str) -> float | None:
+def call_distance_api(origin: str, destination: str, pickup_datetime: datetime) -> dict | None:
     """
-    Calculate distance via backend Google Distance Matrix API.
+    Calculate distance and traffic conditions via backend API.
     
     Args:
         origin: Starting address
         destination: Destination address
+        pickup_datetime: Pickup date and time for traffic prediction
         
     Returns:
-        Distance in kilometers, None if calculation fails
+        Dict with distance_km and traffic_conditions, None if fails
     """
-    response = post_api_data("distance", {"origin": origin, "destination": destination})
+    response = post_api_data("distance", {
+        "origin": origin,
+        "destination": destination,
+        "pickup_datetime": pickup_datetime.strftime("%Y-%m-%dT%H:%M")
+        }
+    )
     processed_data = handle_api_response(response)
     if processed_data:
-        return processed_data.get("distance_km")
+        return processed_data
     return None
 
 
@@ -103,7 +114,8 @@ def handle_api_response(response):
 # Data formatting
 def format_trip_data_for_display(api_response: dict, pickup_address: str, 
                                 destination_address: str, distance: float, 
-                                passenger_count: int) -> dict:
+                                passenger_count: int, weather: str,
+                                traffic_conditions: str) -> dict:
     """
     Transform API response and user inputs into display-ready format.
     
@@ -113,6 +125,8 @@ def format_trip_data_for_display(api_response: dict, pickup_address: str,
         destination_address: User-entered destination address  
         distance: Calculated trip distance
         passenger_count: Number of passengers
+        weather: Weather condition used for prediction
+        traffic_conditions: Traffic condition used for prediction
         
     Returns:
         Dictionary formatted for UI display
@@ -123,5 +137,7 @@ def format_trip_data_for_display(api_response: dict, pickup_address: str,
         'distance': distance,
         'pickup_time': api_response['trip_details']['pickup_time'],
         'passenger_count': passenger_count,
-        'estimated_price': api_response['estimated_price']
+        'estimated_price': api_response['estimated_price'],
+        'weather': weather,
+        'traffic_conditions': traffic_conditions
     }
