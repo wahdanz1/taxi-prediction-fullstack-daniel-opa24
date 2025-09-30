@@ -71,18 +71,30 @@ def render_prediction_workflow(form_data: dict):
     status_text = st.empty()
     
     # Step 1: Calculate distance
-    smooth_progress(progress_bar, status_text, 0, 25, "Calculating distance...", 0.8)
-    distance = get_distance_via_api(form_data['pickup'], form_data['destination'])
+    smooth_progress(progress_bar, status_text, 0, 25, "Calculating distance and traffic...", 0.8)
     
-    if not distance:
+    # Combine pickup date and time
+    pickup_datetime = datetime.combine(form_data['pickup_date'], form_data['pickup_time'])
+    route_data = call_distance_api(form_data['pickup'], form_data['destination'], pickup_datetime)
+    
+    if not route_data:
         handle_processing_error(progress_bar, status_text, 
                                 "Could not calculate distance between the provided addresses")
         return
     
+    distance = route_data['distance_km']
+    traffic_conditions = route_data['traffic_conditions']
+    
     # Step 2: Get ML prediction
     smooth_progress(progress_bar, status_text, 25, 50, "Making ML prediction...", 1.0)
-    response = call_prediction_api(distance, form_data['passenger_count'], 
-                                   form_data['pickup_date'], form_data['pickup_time'])
+    response = call_prediction_api(
+        distance,
+        form_data['passenger_count'], 
+        form_data['pickup_date'],
+        form_data['pickup_time'],
+        weather=form_data.get('weather', 'Clear'),
+        traffic_conditions=traffic_conditions
+    )
     
     # Step 3: Process response
     smooth_progress(progress_bar, status_text, 50, 75, "Processing results...", 0.6)
@@ -95,8 +107,13 @@ def render_prediction_workflow(form_data: dict):
     
     # Step 4: Format and complete
     formatted_data = format_trip_data_for_display(
-        processed_data, form_data['pickup'], form_data['destination'], 
-        distance, form_data['passenger_count']
+        processed_data,
+        form_data['pickup'],
+        form_data['destination'], 
+        distance,
+        form_data['passenger_count'],
+        form_data.get('weather', 'Clear'),
+        traffic_conditions
     )
     
     smooth_progress(progress_bar, status_text, 75, 100, "Finalizing...", 0.8)
@@ -136,10 +153,21 @@ def address_input_with_suggestions(label: str, key: str) -> str:
     )
     
     if user_input:
-        suggestions = call_address_suggestions_api(user_input)
+        # Cache the suggestions in session state to avoid repeated API calls
+        cache_key = f"{key}_suggestions_cache"
+        cached_input_key = f"{key}_cached_input"
+        
+        # Only call API if input has changed
+        if (cache_key not in st.session_state or 
+            st.session_state.get(cached_input_key) != user_input):
+            
+            suggestions = call_address_suggestions_api(user_input)
+            st.session_state[cache_key] = suggestions
+            st.session_state[cached_input_key] = user_input
+        else:
+            suggestions = st.session_state[cache_key]
         
         if suggestions:
-            # Create dropdown with suggestions, limit to 5 for usability
             suggestion_texts = ["Select an address..."] + [
                 s['placePrediction']['text']['text'] for s in suggestions[:5]
             ]
@@ -150,29 +178,10 @@ def address_input_with_suggestions(label: str, key: str) -> str:
                 key=f"{key}_select"
             )
             
-            # Return selected address if user chose one
             if selected != "Select an address...":
                 return selected
     
-    # Return manual input if no suggestion selected
     return user_input
-
-
-# Distance calculation components  
-def get_distance_via_api(origin: str, destination: str) -> float | None:
-    """
-    Calculate distance between two addresses using backend API.
-    
-    Wrapper function for consistent distance calculation throughout the app.
-    
-    Args:
-        origin: Starting address
-        destination: Destination address
-        
-    Returns:
-        Distance in kilometers, None if calculation fails
-    """
-    return call_distance_api(origin, destination)
 
 
 # Results display
@@ -199,6 +208,10 @@ def render_trip_summary(trip_data: dict):
         **Pickup Time:** {trip_data['pickup_time']}
         
         **Passengers:** {trip_data['passenger_count']}
+
+        **Weather Conditions:** {trip_data.get('weather', 'N/A')}
+
+        **Traffic Conditions:** {trip_data.get('traffic_conditions', 'N/A')}
         """)
     
     with col2:
@@ -215,7 +228,7 @@ def render_trip_summary(trip_data: dict):
         - Distance: {trip_data['distance']} km
         - Passengers: {trip_data['passenger_count']}
         - Pickup time: {trip_data['pickup_time']}
-        - Weather conditions
-        - Traffic patterns
-        - Time of day factors
+        - Weather: {trip_data.get('weather', 'N/A')}
+        - Traffic: {trip_data.get('traffic_conditions', 'N/A')}
+        - Time-of-day patterns (to be implemented)
         """)
