@@ -1,6 +1,10 @@
 from fastapi import FastAPI, HTTPException
-from taxipred.backend.data_processing import TaxiData, InputModel, ResponseModel, SuggestionRequest, DistanceRequest
-from taxipred.backend.google_services import suggest_address, get_distance
+from taxipred.backend.data_processing import (
+    TaxiData,
+    InputModel, ResponseModel,
+    SuggestionRequest, DistanceRequest, WeatherRequest
+)
+from taxipred.backend.google_services import suggest_address, get_distance_and_traffic, get_weather
 
 app = FastAPI(
     title="TaxiPred API",
@@ -100,26 +104,37 @@ async def get_address_suggestions(request: SuggestionRequest) -> dict:
 @app.post("/distance")
 async def calculate_trip_distance(request: DistanceRequest) -> dict:
     """
-    Calculate driving distance between two addresses.
+    Calculate driving distance and traffic conditions between two addresses.
     
-    Uses Google Distance Matrix API to compute actual road distance
-    rather than straight-line distance for accurate fare prediction.
+    Uses Google Routes API to compute actual road distance and estimate
+    current traffic conditions based on travel time comparison.
     
     Args:
         request: Origin and destination addresses
         
     Returns:
-        Dictionary containing distance in kilometers
+        Dictionary containing distance_km and traffic_conditions
         
     Raises:
-        HTTPException: 400 if distance cannot be calculated, 500 for API errors
+        HTTPException: 400 if calculation fails, 500 for API errors
     """
     try:
-        distance = get_distance(request.origin, request.destination)
-        if distance is None:
+        result = get_distance_and_traffic(request.origin, request.destination, request.pickup_datetime)
+        if result is None:
             raise HTTPException(status_code=400, detail="Could not calculate distance between addresses")
-        return {"distance_km": distance}
+        return result
     except HTTPException:
-        raise  # Re-raise HTTPExceptions as-is
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Distance calculation error: {str(e)}")
+
+
+@app.post("/weather")
+async def get_weather_conditions(request: WeatherRequest):
+    """Docstring to be added"""
+    try:
+        weather = get_weather(request.latitude, request.longitude)
+        return {"weather": weather}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Weather lookup error: {str(e)}")
+
