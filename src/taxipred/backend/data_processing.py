@@ -220,3 +220,9 @@ class DistanceRequest(BaseModel):
     """Request model for distance calculations."""
     origin: str = Field(description="Origin address")
     destination: str = Field(description="Destination address")
+    pickup_datetime: datetime = Field(description="Pickup date and time")
+
+class WeatherRequest(BaseModel):
+    """Request model for weather conditions lookup."""
+    latitude: float = Field(description="Location latitude")
+    longitude: float = Field(description="Location longitude")
