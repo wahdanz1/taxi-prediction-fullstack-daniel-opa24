@@ -33,7 +33,7 @@ TaxiPred is a full-stack machine learning application that predicts taxi fare pr
 | **Frontend** | Streamlit | Interactive multi-page dashboard |
 | **ML Framework** | scikit-learn | Model training, prediction, and evaluation |
 | **Data Validation** | Pydantic | Type validation and serialization |
-| **External APIs** | Google Places & Distance Matrix | Location services and distance calculation |
+| **External APIs** | Google Places & Routes | Location services and distance calculation |
 | **Package Management** | UV | Modern Python dependency management |
 | **Data Processing** | pandas, joblib | Data manipulation and model persistence |
 
@@ -49,29 +49,30 @@ taxipred/
 │   │   ├── api.py                   # FastAPI application with all endpoints
 │   │   ├── data_processing.py       # Runtime ML pipeline and feature engineering
 │   │   └── google_services.py       # Google APIs integration
-│   ├── scripts/
-│   │   ├── data_cleaning.py         # Advanced data cleaning pipeline
-│   │   └── train_model.py          # Model training pipeline
-│   ├── frontend/
-│   │   ├── pages/
-│   │   │   ├── 1_Price_Prediction.py    # Main prediction interface
-│   │   │   ├── 2_Model_Performance.py   # Model analytics dashboard
-│   │   │   └── 3_Data_Explorer.py       # Dataset exploration tools
-│   │   ├── dashboard.py             # Main Streamlit application
-│   │   ├── ui_helpers.py           # Frontend utility functions
-│   │   ├── ui_components.py        # Reusable UI components
-│   │   └── styles.css              # Custom styling
 │   ├── data/
 │   │   ├── taxi_trip_pricing.csv        # Original dataset
 │   │   └── taxi_trip_pricing_clean.csv  # Processed dataset
+│   ├── frontend/
+│   │   ├── pages/
+│   │   │   ├── 1_Price_Prediction.py    # Main prediction interface
+│   │   │   ├── 2_Data_Explorer.py       # Dataset exploration tools
+│   │   │   └── 3_Model_Performance.py   # Model analytics dashboard
+│   │   ├── dashboard.py            # Main Streamlit application
+│   │   ├── styles.css              # Custom styling
+│   │   ├── ui_components.py        # Reusable UI components
+│   │   └── ui_helpers.py           # Frontend utility functions
+│   ├── scripts/
+│   │   ├── data_cleaning.py        # Advanced data cleaning pipeline
+│   │   └── train_model.py          # Model training pipeline
 │   └── utils/
-│       ├── constants.py            # Project-wide constants
-│       └── api_helpers.py          # API communication utilities
+│       ├── api_helpers.py          # API communication utilities
+│       └── constants.py            # Project-wide constants
 ├── data_cleaning_summary.md        # Detailed data processing documentation
-├── .env                            # Environment variables (create this)
-├── start.ps1                       # Windows launcher script
+├── .env                            # Environment variables (create this!)
+├── README.md
 ├── pyproject.toml                  # Project dependencies and metadata
-└── README.md
+├── start.ps1                       # Windows launcher script
+└── uv.lock                         # UV dependencies file
 ```
 
 ## 🚀 Quick Start
@@ -79,7 +80,7 @@ taxipred/
 ### Prerequisites
 - Python 3.8+
 - UV package manager (recommended) or pip
-- Google Cloud API key for Places and Distance Matrix APIs
+- Google Cloud API key for Places and Routes APIs
 
 ### Installation
 
@@ -100,7 +101,13 @@ taxipred/
    echo "GMAPS_API_KEY=your_google_api_key_here" > .env
    ```
 
-4. **Launch the application**
+4. **Train model and save joblib-files**
+   ```bash
+   # Run model training script
+   python src/scripts/train_model.py
+   ```
+
+5. **Launch the application**
    ```bash
    # Windows PowerShell (recommended)
    .\start.ps1
@@ -128,32 +135,35 @@ taxipred/
 
 ### API Endpoints
 - `GET /health` - API health check
-- `GET /taxi/` - Retrieve cleaned dataset
+- `GET /taxi` - Retrieve cleaned dataset
 - `GET /taxi/stats` - Dataset statistics
 - `POST /predict` - Generate fare prediction
 - `POST /suggestion` - Get address suggestions
-- `POST /distance` - Calculate trip distance
+- `POST /distance` - Calculate trip distance & traffic conditions
+- `POST /weater` - Calculate trip distance & traffic conditions
 
 ## 📊 Machine Learning Pipeline
 
 ### Advanced Data Processing
-- **Three-round cleaning methodology** with mathematical recovery and data leakage prevention
-- **Sophisticated feature engineering** including weather/traffic multipliers and interaction terms  
+- **Cleaning methodology** with mathematical recovery and data leakage prevention
+- **Sophisticated feature engineering** including weather/traffic multipliers and interaction terms
 - **Honest performance evaluation** prioritizing legitimate prediction over artificially low error rates
 - **Data retention**: 97.7% of original data retained through intelligent cleaning
 
 *See [data_cleaning_summary.md](data_cleaning_summary.md) for detailed technical documentation*
 
 ### Model Architecture
-- **Distance-based pricing**: Primary fare component (97% feature importance)
-- **Environmental factors**: Weather impact (Clear: 1.0, Rain: 1.15, Snow: 1.3) and traffic multipliers
+- **Distance-based pricing**: Primary fare component (61% feature importance)
+- **Interaction features**: `distance_x_conditions` captures complex weather/traffic relationships (37% feature importance)
+- **Environmental factors**: Weather impact (Clear: 1.0, Rain: 1.15, Snow: 1.3) and traffic multipliers (Low: 1.0, Medium: 1.1, High: 1.25)
 - **Time-based adjustments**: Rush hour detection, weekend patterns, peak hour identification
-- **Interaction features**: Complex relationships like `distance_x_conditions` for enhanced accuracy
+- **Top 3 features explain 98.7% of predictions**, demonstrating model efficiency
 
 ### Performance Metrics
-- **Final Model**: $15.74 MAE, 0.821 R² (legitimate prediction without data leakage)
-- **Feature importance tracking** and comprehensive model validation
-- **Production-ready artifacts** with persistent model storage
+- **Production Model**: GradientBoosting with $15.56 MAE, 0.828 R² (legitimate prediction without data leakage)
+- **Model Comparison**: Outperformed LinearRegression ($17.00 MAE) and RandomForest ($15.91 MAE)
+- **Test Set Performance**: 196 samples, consistent validation across multiple metrics
+- **Production-ready artifacts**: Trained model, metrics, and feature importance saved for deployment
 
 ## 🔧 Configuration
 
@@ -164,10 +174,10 @@ GMAPS_API_KEY=your_google_maps_api_key
 ```
 
 ### Google APIs Setup
-1. Enable Google Places API
-2. Enable Google Distance Matrix API  
+1. Enable Google _Places API (New)_
+2. Enable Google _Routes API_
 3. Create API key with appropriate restrictions
-4. Add billing information (required for production usage)
+4. Add billing information (required for production usage) - but these can be used with Free Tier
 
 ## 🎓 Learning Outcomes
 
@@ -197,12 +207,15 @@ This project demonstrates advanced ML engineering concepts:
 - [x] Complete ML pipeline with sophisticated data cleaning and feature engineering
 - [x] FastAPI backend with comprehensive endpoints and validation
 - [x] Multi-page Streamlit frontend with professional UI
-- [x] Google APIs integration (Places & Distance Matrix)
-- [x] Real-time prediction with smooth progress tracking
-- [x] Address autocomplete functionality
-- [x] Robust error handling and user feedback
+- [x] Google APIs integration (Places New, Routes, and Weather APIs)
+- [x] Real-time traffic prediction based on departure time
+- [x] Real-time weather conditions for accurate fare estimation
+- [x] Address autocomplete functionality with session state caching
+- [x] Smooth progress tracking with animated UI transitions
+- [x] Robust error handling with graceful degradation
 - [x] Model persistence with metrics and feature importance tracking
-- [x] Data exploration and visualization tools
+- [x] Data exploration and model performance visualization pages
+- [x] Rush hour detection with API prediction validation
 
 ## 🤝 Contributing
 
