@@ -8,8 +8,9 @@ TaxiPred is a full-stack machine learning application that predicts taxi fare pr
 
 ### 🎯 **Core Functionality**
 - **Smart Price Prediction**: ML-powered fare estimation using distance, passenger count, pickup time, weather, and traffic conditions
-- **Address Autocomplete**: Google Places API integration for seamless location input
-- **Real-time Distance Calculation**: Automatic route distance computation via Google Distance Matrix API
+- **Address Autocomplete**: Google Places API (New) integration for seamless location input
+- **Real-time Distance & Traffic**: Route calculation via Google Routes API with departure time-based traffic prediction
+- **Real-time Weather Data**: Google Weather API integration providing current conditions mapped to model categories
 - **Interactive Progress Tracking**: Smooth UI feedback during prediction process
 
 ### 📊 **Dashboard & Analytics**
@@ -33,7 +34,7 @@ TaxiPred is a full-stack machine learning application that predicts taxi fare pr
 | **Frontend** | Streamlit | Interactive multi-page dashboard |
 | **ML Framework** | scikit-learn | Model training, prediction, and evaluation |
 | **Data Validation** | Pydantic | Type validation and serialization |
-| **External APIs** | Google Places & Routes | Location services and distance calculation |
+| **External APIs** | Google Places (New), Routes & Weather | Location autocomplete, route calculation, and weather data |
 | **Package Management** | UV | Modern Python dependency management |
 | **Data Processing** | pandas, joblib | Data manipulation and model persistence |
 
@@ -78,9 +79,9 @@ taxipred/
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Python 3.8+
+- Python 3.10+ (developed and tested on 3.13)
 - UV package manager (recommended) or pip
-- Google Cloud API key for Places and Routes APIs
+- Google Cloud API key for Places (New), Routes, and Weather APIs
 
 ### Installation
 
@@ -104,7 +105,7 @@ taxipred/
 4. **Train model and save joblib-files**
    ```bash
    # Run model training script
-   python src/scripts/train_model.py
+   python src/taxipred/scripts/train_model.py
    ```
 
 5. **Launch the application**
@@ -140,7 +141,7 @@ taxipred/
 - `POST /predict` - Generate fare prediction
 - `POST /suggestion` - Get address suggestions
 - `POST /distance` - Calculate trip distance & traffic conditions
-- `POST /weater` - Calculate trip distance & traffic conditions
+- `POST /weather` - Calculate trip distance & traffic conditions
 
 ## 📊 Machine Learning Pipeline
 
@@ -176,8 +177,9 @@ GMAPS_API_KEY=your_google_maps_api_key
 ### Google APIs Setup
 1. Enable Google _Places API (New)_
 2. Enable Google _Routes API_
-3. Create API key with appropriate restrictions
-4. Add billing information (required for production usage) - but these can be used with Free Tier
+3. Enable Google _Weather API_
+4. Create API key with appropriate restrictions
+5. Add billing information (required for production usage) - but these can be used with Free Tier
 
 ## 🎓 Learning Outcomes
 
@@ -207,7 +209,7 @@ This project demonstrates advanced ML engineering concepts:
 - [x] Complete ML pipeline with sophisticated data cleaning and feature engineering
 - [x] FastAPI backend with comprehensive endpoints and validation
 - [x] Multi-page Streamlit frontend with professional UI
-- [x] Google APIs integration (Places New, Routes, and Weather APIs)
+- [x] Google APIs integration (Places (New), Routes, and Weather APIs)
 - [x] Real-time traffic prediction based on departure time
 - [x] Real-time weather conditions for accurate fare estimation
 - [x] Address autocomplete functionality with session state caching
