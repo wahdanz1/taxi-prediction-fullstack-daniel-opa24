@@ -18,6 +18,24 @@ def post_api_data(endpoint: str, data: dict):
     return response
 
 
+# Cleaned dataset call
+def get_dataset():
+    response = get_api_data("taxi")
+    processed_data = handle_api_response(response)
+    if processed_data:
+        return processed_data
+    return []
+
+
+# Dataset statistics call
+def get_stats():
+    response = get_api_data("taxi/stats")
+    processed_data = handle_api_response(response)
+    if processed_data:
+        return processed_data
+    return []
+
+
 # Prediction API calls
 def call_prediction_api(distance: float, passenger_count: int, pickup_date, pickup_time, 
                         weather: str, traffic_conditions: str):
