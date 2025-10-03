@@ -35,7 +35,7 @@ def render_trip_form():
         default_time = round_to_quarter(now, up=True)
         pickup_time = st.time_input("🕐 Pickup Time", value=default_time, step=900)
     with col5:
-        passenger_count = st.selectbox("🙋 Number of Passengers", options=[1, 2, 3, 4])
+        passenger_count = st.number_input("🙋 Number of Passengers", min_value=1, max_value=4, step=1)
 
     if st.button("Get Price Estimate", type="primary", use_container_width=True):
         if pickup_address and destination_address:
