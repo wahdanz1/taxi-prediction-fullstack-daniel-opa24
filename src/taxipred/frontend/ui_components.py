@@ -1,9 +1,11 @@
 import streamlit as st
+import pandas as pd
 from datetime import datetime
 import time
 
-from taxipred.utils.api_helpers import call_address_suggestions_api, call_distance_api, call_prediction_api, handle_api_response, format_trip_data_for_display
+from taxipred.utils.api_helpers import call_address_suggestions_api, call_distance_api, call_prediction_api, handle_api_response, format_trip_data_for_display, get_model_metrics, get_feature_importance
 from taxipred.frontend.ui_helpers import round_to_quarter, smooth_progress, handle_processing_error
+from taxipred.frontend.ml_glossary import MODEL_DESCRIPTIONS, GLOSSARY_TERMS
 
 
 # Form rendering
@@ -37,7 +39,7 @@ def render_trip_form():
     with col5:
         passenger_count = st.number_input("🙋 Number of Passengers", min_value=1, max_value=4, step=1)
 
-    if st.button("Get Price Estimate", type="primary", use_container_width=True):
+    if st.button("Get Price Estimate", type="primary", width="stretch"):
         if pickup_address and destination_address:
             form_data = {
                 'pickup': pickup_address,
@@ -232,3 +234,108 @@ def render_trip_summary(trip_data: dict):
         - Traffic: {trip_data.get('traffic_conditions', 'N/A')}
         - Time-of-day patterns (to be implemented)
         """)
+
+
+def render_metrics_section():
+    """Display model performance metrics."""
+    st.subheader("Model Comparison")
+
+    with st.spinner("Loading model metrics..."):
+        metrics = get_model_metrics()
+    
+    if not metrics:
+        st.error("Unable to load model metrics")
+        return
+    
+    # Display best model info at the top
+    best_model = min(metrics.keys(), key=lambda k: metrics[k]['mae'])
+    st.info(f"**Best Performing Model:** {best_model}")
+    
+    # Create comparison table
+    comparison_data = []
+    for model_name, scores in metrics.items():
+        comparison_data.append({
+            "Model": model_name,
+            "MAE ($)": f"${scores['mae']:.2f}",
+            "RMSE ($)": f"${scores['rmse']:.2f}",
+            "R² Score": f"{scores['r2']:.3f}"
+        })
+    
+    st.dataframe(comparison_data, hide_index=True, use_container_width=True)
+    
+    # Add metric explanations
+    with st.expander("📖 Understanding the Metrics"):
+        st.markdown("""
+        **MAE (Mean Absolute Error)**: Average prediction error in dollars. Lower is better.
+        
+        **RMSE (Root Mean Squared Error)**: Emphasizes larger errors more than MAE. Lower is better.
+        
+        **R² Score**: Proportion of variance explained by the model (0-1). Higher is better.
+        """)
+
+
+def render_feature_importance_section():
+    """Display feature importance visualization."""
+    st.subheader("Feature Importance Analysis")
+
+    with st.spinner("Loading feature importance data..."):
+        importance = get_feature_importance()
+    
+    if not importance:
+        st.error("Unable to load feature importance data")
+        return
+    
+    # Convert to displayable format
+    df_importance = pd.DataFrame(importance, columns=['Feature', 'Importance'])
+    df_importance['Importance (%)'] = (df_importance['Importance'] * 100).round(1)
+    df_importance = df_importance.sort_values('Importance', ascending=False)
+    
+    col1, col2 = st.columns([0.6, 0.4])
+    
+    with col1:
+        # Bar chart
+        st.bar_chart(df_importance.set_index('Feature')['Importance'])
+    
+    with col2:
+        # Table with percentages
+        display_df = df_importance[['Feature', 'Importance (%)']].copy()
+        st.dataframe(display_df, hide_index=True, width="stretch")
+    
+    # Key insights
+    top_3_importance = df_importance.head(3)['Importance'].sum()
+    st.success(f"**Top 3 features explain {top_3_importance*100:.1f}% of predictions**")
+    
+    with st.expander("💡 Feature Descriptions"):
+        st.markdown("""
+        **trip_distance_km**: Distance of the trip in kilometers
+        
+        **distance_x_conditions**: Interaction between distance and weather/traffic conditions
+        
+        **passenger_count**: Number of passengers
+        
+        **traffic_multiplier**: Impact of traffic level (Low/Medium/High)
+        
+        **weather_impact**: Impact of weather conditions (Clear/Rain/Snow)
+        """)
+
+
+def render_glossary_section():
+    """Display ML concepts and terminology."""
+    st.subheader("Model Algorithms Explained")
+    st.text("Below you can find explanations of the three different Machine Learning-models that was trained/tested on our dataset.")
+    
+    # Model descriptions as expandable cards
+    for model, description in MODEL_DESCRIPTIONS.items():
+        with st.expander(f"**{model}**"):
+            st.write(description)
+    
+    st.subheader("Technical Terms Glossary")
+    
+    # Convert glossary to dataframe
+    glossary_df = pd.DataFrame([
+        {"Term": term, "Definition": definition} 
+        for term, definition in GLOSSARY_TERMS.items()
+    ])
+    
+    st.dataframe(glossary_df, hide_index=True, width="stretch")
+    

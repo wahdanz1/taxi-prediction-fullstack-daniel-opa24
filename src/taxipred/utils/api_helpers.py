@@ -159,3 +159,16 @@ def format_trip_data_for_display(api_response: dict, pickup_address: str,
         'weather': weather,
         'traffic_conditions': traffic_conditions
     }
+
+
+# Model Perfmorance Helpers
+def get_model_metrics() -> dict:
+    """Get model performance metrics from API."""
+    response = get_api_data("model/metrics")
+    return handle_api_response(response) or {}
+
+
+def get_feature_importance() -> list:
+    """Get feature importance data from API."""
+    response = get_api_data("model/feature-importance")
+    return handle_api_response(response) or []
