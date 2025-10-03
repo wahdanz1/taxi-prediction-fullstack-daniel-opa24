@@ -9,7 +9,7 @@ from taxipred.backend.google_services import suggest_address, get_distance_and_t
 app = FastAPI(
     title="TaxiPred API",
     description="AI-powered taxi fare prediction API with location services",
-    version="1.2.0"
+    version="1.2.1"
 )
 
 taxi_data = TaxiData()
@@ -21,13 +21,16 @@ async def health_check() -> dict:
     return {"status": "healthy", "service": "TaxiPred API"}
 
 
-@app.get("/taxi/")
+@app.get("/taxi")
 async def get_taxi_data() -> list:
     """
     Retrieve the cleaned taxi dataset in JSON format.
     
     Returns:
         List of taxi trip records with all features used for training
+        
+    Raises:
+        HTTPException: 500 for API errors
     """
     try:
         return taxi_data.to_json()
@@ -42,6 +45,9 @@ async def get_dataset_stats() -> dict:
     
     Returns:
         Dataset statistics including record counts, price distribution, and distance metrics
+
+    Raises:
+        HTTPException: 500 for API errors
     """
     try:
         return taxi_data.get_stats()
@@ -96,6 +102,8 @@ async def get_address_suggestions(request: SuggestionRequest) -> dict:
         
     Returns:
         Dictionary containing list of address suggestions
+    Raises:
+        HTTPException: 500 for API errors
     """
     try:
         suggestions = suggest_address(request.query)
@@ -133,8 +141,22 @@ async def calculate_trip_distance(request: DistanceRequest) -> dict:
 
 
 @app.post("/weather")
-async def get_weather_conditions(request: WeatherRequest):
-    """Docstring to be added"""
+async def get_weather_conditions(request: WeatherRequest) -> dict:
+    """
+    Get current weather conditions for a location.
+    
+    Uses Google Weather API to fetch real-time weather data and maps it to
+    model categories (Clear, Rain, Snow) for accurate fare prediction.
+    
+    Args:
+        request: Latitude and longitude coordinates
+        
+    Returns:
+        Dictionary containing weather condition category
+        
+    Raises:
+        HTTPException: 500 for weather API errors
+    """
     try:
         weather = get_weather(request.latitude, request.longitude)
         return {"weather": weather}
