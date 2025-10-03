@@ -29,7 +29,10 @@ async def get_taxi_data() -> list:
     Returns:
         List of taxi trip records with all features used for training
     """
-    return taxi_data.to_json()
+    try:
+        return taxi_data.to_json()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error retrieving dataset: {str(e)}")
 
 
 @app.get("/taxi/stats")
