@@ -163,3 +163,41 @@ async def get_weather_conditions(request: WeatherRequest) -> dict:
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Weather lookup error: {str(e)}")
 
+
+@app.get("/model/metrics")
+async def get_model_metrics() -> dict:
+    """
+    Get trained model performance metrics.
+    
+    Returns:
+        Model comparison metrics including MAE, RMSE, and R² scores
+        
+    Raises:
+        HTTPException: 404 if metrics not available, 500 for retrieval errors
+    """
+    try:
+        if taxi_data.model_metrics:
+            return taxi_data.model_metrics
+        raise HTTPException(status_code=404, detail="Model metrics not available")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error retrieving metrics: {str(e)}")
+
+
+@app.get("/model/feature-importance")
+async def get_feature_importance() -> list:
+    """
+    Get feature importance rankings from trained model.
+    
+    Returns:
+        List of tuples containing feature names and importance scores
+        
+    Raises:
+        HTTPException: 404 if feature importance not available, 500 for retrieval errors
+    """
+    try:
+        if taxi_data.feature_importance:
+            return taxi_data.feature_importance
+        raise HTTPException(status_code=404, detail="Feature importance not available")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error retrieving feature importance: {str(e)}")
+    
