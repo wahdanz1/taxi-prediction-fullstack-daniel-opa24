@@ -12,7 +12,7 @@ logger = logging.getLogger("uvicorn.error")
 
 def suggest_address(input_text: str) -> list:
     """
-    Get address suggestions from Google Places API.
+    Get address suggestions from Google Places API (New).
     
     Searches for addresses within Sweden using Google Places autocomplete
     with location bias to improve relevance of results.
@@ -21,7 +21,7 @@ def suggest_address(input_text: str) -> list:
         input_text: Address search query
         
     Returns:
-        List of address suggestions from Google Places API
+        List of address suggestions from Google Places API (New)
     """
     if not input_text:
         return []

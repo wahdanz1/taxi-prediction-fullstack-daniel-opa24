@@ -256,7 +256,7 @@ def render_metrics_section():
             "R² Score": f"{scores['r2']:.3f}"
         })
     
-    st.dataframe(comparison_data, hide_index=True, use_container_width=True)
+    st.dataframe(comparison_data, hide_index=True, width="stretch")
     
     # Add metric explanations
     with st.expander("📖 Understanding the Metrics"):
