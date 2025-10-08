@@ -27,7 +27,7 @@ def main():
         # State 3: Results display
         render_trip_summary(st.session_state.trip_data)
         
-        if st.button("New Trip Prediction", type="primary", use_container_width=True):
+        if st.button("New Trip Prediction", type="primary", width="stretch"):
             reset_prediction_state()
             st.rerun()
 

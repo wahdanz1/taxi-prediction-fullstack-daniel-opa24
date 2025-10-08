@@ -210,10 +210,6 @@ def render_trip_summary(trip_data: dict):
         **Pickup Time:** {trip_data['pickup_time']}
         
         **Passengers:** {trip_data['passenger_count']}
-
-        **Weather Conditions:** {trip_data.get('weather', 'N/A')}
-
-        **Traffic Conditions:** {trip_data.get('traffic_conditions', 'N/A')}
         """)
     
     with col2:
@@ -232,7 +228,6 @@ def render_trip_summary(trip_data: dict):
         - Pickup time: {trip_data['pickup_time']}
         - Weather: {trip_data.get('weather', 'N/A')}
         - Traffic: {trip_data.get('traffic_conditions', 'N/A')}
-        - Time-of-day patterns (to be implemented)
         """)
 
 

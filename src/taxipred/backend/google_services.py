@@ -65,10 +65,6 @@ def get_distance_and_traffic(origin: str, destination: str, pickup_datetime) -> 
         return None
         
     try:
-        logger.info(f"=== DISTANCE API CALLED ===")
-        logger.info(f"Origin: {origin}")
-        logger.info(f"Destination: {destination}")
-
         url = "https://routes.googleapis.com/directions/v2:computeRoutes"
         headers = {
             "Content-Type": "application/json",
@@ -84,8 +80,6 @@ def get_distance_and_traffic(origin: str, destination: str, pickup_datetime) -> 
             "departureTime": pickup_datetime.isoformat() + "Z",
             "computeAlternativeRoutes": False
         }
-
-        logger.info(f"DEBUG - Sending departureTime: {pickup_datetime.isoformat() + 'Z'}")
         
         response = requests.post(url, json=data, headers=headers)
         
@@ -115,10 +109,6 @@ def get_distance_and_traffic(origin: str, destination: str, pickup_datetime) -> 
         if static_duration_seconds > 0:
             traffic_ratio = duration_seconds / static_duration_seconds
             
-            logger.info(f"DEBUG - Static duration: {static_duration_seconds}s ({static_duration_seconds/60:.1f} min)")
-            logger.info(f"DEBUG - Traffic duration: {duration_seconds}s ({duration_seconds/60:.1f} min)")
-            logger.info(f"DEBUG - Traffic ratio: {traffic_ratio:.3f}")
-            
             # Check if pickup time is during rush hour
             hour = pickup_datetime.hour
             weekday = pickup_datetime.weekday()
@@ -134,10 +124,8 @@ def get_distance_and_traffic(origin: str, destination: str, pickup_datetime) -> 
             
             # Override if API suggests low traffic during known rush hours
             if is_rush_hour and traffic_conditions == "Low":
-                logger.info(f"DEBUG - Overriding Low to Medium (rush hour detected)")
                 traffic_conditions = "Medium"
             
-            logger.info(f"DEBUG - Final traffic condition: {traffic_conditions}")
         else:
             traffic_conditions = "Medium"
         
